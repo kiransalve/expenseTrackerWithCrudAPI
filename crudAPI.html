@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crud Crud </title>
+</head>
+
+<body>
+    <div>
+        <header>
+            <h1>Expense Tracker App with Crud Crud API</h1>
+        </header>
+        <form onsubmit="savetoCrud(event)">
+            <hr>
+            <br />
+            <label for="exp_amt">Expense Amount : </label>
+            <input type="number" name="amount" id="name"><br /><br />
+            <label for="description">Description : </label>
+            <input type="text" name="description" id="description"><br /><br />
+            <label for="category">Enter Expense Amount</label>
+            <select id="category">
+                <option value="movie">Movie</option>
+                <option value="food">Food</option>
+                <option value="rent">Rent</option>
+                <option value="travelling">Travelling</option>
+                <option value="stationary">Stationary</option>
+            </select>
+            <button type="submit" id="button">Submit</button>
+        </form>
+        <ul id="exp"></ul>
+    </div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
+
+<script>
+
+    // save to crudcrud api
+    function savetoCrud(event) {
+        // prevent page refreshing
+        event.preventDefault();
+        // get user typed values
+        const amount = event.target.amount.value
+        const description = event.target.description.value
+        const category = event.target.category.value
+
+        // store user typed values in object
+        const obj = {
+            amount, description, category
+        }
+        // send post request to save user typed values in crudcrud api with route appointmentData
+        axios.post('https://crudcrud.com/api/a1c80a443e0e417184bf0950f4de268e/appointmentData', obj)
+            .then(response => showUsers(response.data) // show saved user data
+            ).catch(error => console.log(error)) // show error if any to console
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+        axios.get('https://crudcrud.com/api/a1c80a443e0e417184bf0950f4de268e/appointmentData')
+            .then(
+                response => {
+                    for (let i = 0; i < response.data.length; i++) {
+                        showUsers(response.data[i])
+
+                    }
+
+                }
+            ).catch(err => console.log(err))
+
+    })
+
+
+    // show saved user data 
+    function showUsers(exp) {
+        const list = document.getElementById("exp")
+        const node =
+            `<li id=${exp._id}> ${exp.amount} - ${exp.description} - ${exp.category}
+    <button onclick=removeItems('${exp._id}')> Delete </button>
+    <button onclick=editUsers('${exp._id}',${exp.amount}, '${exp.description}','${exp.category}')> Edit </button></li>`
+        list.innerHTML = list.innerHTML + node
+    }
+
+    // edit user data
+    function editUsers(expID, amount, description, category) {
+        document.getElementById('amount').value = amount;
+        document.getElementById('description').value = description;
+        document.getElementById('category').value = category;
+        removeItems(expID)
+    }
+
+    // delete user data from api
+    function removeItems(expID) {
+        axios.delete(`https://crudcrud.com/api/a1c80a443e0e417184bf0950f4de268e/appointmentData/${expID}`)
+            .then(response => {
+                removeUserFromScreen(expID)
+            }).catch(err => console.log(err))
+    }
+    // delete user data from screen
+    function removeUserFromScreen(expID) {
+        const parentNode = document.getElementById("exp");
+        const childNodeToDelete = document.getElementById(expID);
+
+        if (childNodeToDelete) {
+            parentNode.removeChild(childNodeToDelete);
+        }
+    }
+</script>
+
+</html>
